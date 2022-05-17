@@ -29,26 +29,52 @@ def index():
                 fw = open(filename, 'w')
                 fw.write(text)
                 fw.close()
-                flash('The message was saved and will be displayed momentarily.', 'success')
+                if is_up():
+                    flash('The message was saved and will be displayed momentarily!', 'success')
+                else:
+                    flash('The message was saved but the service is currently stopped!', 'warning')
+
                 return redirect('/')
 
-        return render_template('index.html', current_value=current_value)
+        return render_template('index.html', current_value=current_value, is_up=is_up())
+
+
+@app.route('/start', methods=['GET'])
+def start():
+    return run_cmd(['systemctl', '-l', 'start', 'led-display'],
+                   'Successfully started systemd service!',
+                   'Failed to start systemd service!')
+
+
+@app.route('/stop', methods=['GET'])
+def stop():
+    return run_cmd(['systemctl', '-l', 'stop', 'led-display'],
+                   'Successfully stopped systemd service!',
+                   'Failed to stop systemd service!')
 
 
 @app.route('/restart', methods=['GET'])
-def restart_controller():
-    command = subprocess.run(['systemctl', 'restart', 'led-display.service'])
+def restart():
+    return run_cmd(['systemctl', '-l', 'restart', 'led-display'],
+                   'Successfully restarted systemd service!',
+                   'Failed to restart systemd service!')
+
+
+def is_up():
+    stat = subprocess.call(['systemctl', 'is-active', '--quiet', 'led-display'])
+    return stat == 0
+
+
+def run_cmd(cmd, success_message, failure_message):
+    command = subprocess.run(cmd)
 
     if command.returncode:
-        flash('An error occurred: {}'.format(command.stderr), 'danger')
+        flash(failure_message, 'danger')
         return redirect('/')
     else:
-        flash('The controller systemd service was restarted successfully.  Output: {}'.format(command.stdout), 'success')
+        flash(success_message, 'success')
         return redirect('/')
 
 
 if __name__ == '__main__':
-    app.secret_key = 'super secret key'
-    app.config['SESSION_TYPE'] = 'filesystem'
-
     app.run(host='0.0.0.0')
