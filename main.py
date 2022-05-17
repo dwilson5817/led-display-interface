@@ -1,10 +1,17 @@
-from flask import Flask, render_template, request, redirect
+import subprocess
+from pathlib import Path
+
+from flask import Flask, render_template, request, redirect, flash
 
 app = Flask(__name__)
 
-@app.route('/', methods=["GET", "POST"])
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    with open('/home/dylan/led_display.txt') as f:
+    filename = Path('../led_display.txt')
+    filename.touch(exist_ok=True)
+
+    with open(filename, 'r') as f:
         current_value = f.readline().rstrip('\n')
 
         if request.method == "POST":
@@ -13,14 +20,32 @@ def index():
             text = req.get("text")
 
             if not text:
-                return render_template('index.html', current_value=current_value, error_message="Message is empty")
+                flash('The message cannot be empty!', 'danger')
+                return redirect('/')
             else:
-                fw = open("/home/dylan/led_display.txt", "w")
+                fw = open(filename, 'w')
                 fw.write(text)
                 fw.close()
-                return render_template('index.html', current_value=text, success_message="Message saved!")
+                flash('The message was saved and will be displayed momentarily.', 'success')
+                return redirect('/')
 
         return render_template('index.html', current_value=current_value)
 
-if __name__ == "__main__":
+
+@app.route('/restart', methods=['GET'])
+def restart_controller():
+    command = subprocess.run(['systemctl', 'restart', 'led-display.service'])
+
+    if command.returncode:
+        flash('An error occurred: {}'.format(command.stderr), 'danger')
+        return redirect('/')
+    else:
+        flash('The controller systemd service was restarted successfully.  Output: {}'.format(command.stdout), 'success')
+        return redirect('/')
+
+
+if __name__ == '__main__':
+    app.secret_key = 'super secret key'
+    app.config['SESSION_TYPE'] = 'filesystem'
+
     app.run(host='0.0.0.0')
