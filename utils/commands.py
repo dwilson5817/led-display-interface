@@ -4,9 +4,8 @@ from flask import flash, redirect
 
 
 def is_up():
-    return True
-    # stat = subprocess.call(['systemctl', 'is-active', '--quiet', 'led-display'])
-    # return stat == 0
+    stat = subprocess.call(['systemctl', 'is-active', '--quiet', 'led-display'])
+    return stat == 0
 
 
 def run_cmd(cmd, success_message, failure_message):
