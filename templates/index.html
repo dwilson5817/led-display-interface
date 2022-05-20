@@ -59,7 +59,7 @@
             <div class="card-body">
                 <form method="post">
                     <div class="mb-3">
-                        <label class="form-label" for="input-text">Text</label> <input aria-describedby="text-help-block" class="form-control" id="input-text" name="text" type="text" value="{{ current_value }}">
+                        <label class="form-label" for="input-text">Text</label> <input aria-describedby="text-help-block" class="form-control" id="input-text" name="text" type="text" value="{{ message }}">
                         <div class="form-text" id="text-help-block">
                             There is no limit but Emoji probably won't work.
                         </div>
@@ -75,7 +75,7 @@
             <div class="card-body">
                 <p>Connect Spotify to display What's Playing?</p>
 
-                {% if spotify is defined %}
+                {% if spotify %}
                 <p>Currently connected to <strong>{{ spotify.current_user().get('display_name') }}</strong>'s account.</p>
                 <a class="btn btn-danger" href="/spotify/disconnect" role="button">Disconnect</a>
                 {% else %}
