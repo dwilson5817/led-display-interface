@@ -11,14 +11,14 @@
 <body>
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">LED Display</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">LED Display</a>
 
             <div class="d-flex">
                 {% if is_up %}
-                <a class="btn btn-outline-danger me-2" href="/stop" role="button">Stop</a>
-                <a class="btn btn-outline-warning" href="/restart" role="button">Restart</a>
+                <a class="btn btn-outline-danger me-2" href="{{ url_for('service_stop') }}" role="button">Stop</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('service_restart') }}" role="button">Restart</a>
                 {% else %}
-                <a class="btn btn-outline-success" href="/start" role="button">Start</a>
+                <a class="btn btn-outline-success" href="{{ url_for('service_start') }}" role="button">Start</a>
                 {% endif %}
             </div>
         </div>
@@ -73,14 +73,25 @@
                 Spotify
             </div>
             <div class="card-body">
-                <p>Connect Spotify to display What's Playing?</p>
-
-                {% if spotify %}
-                <p>Currently connected to <strong>{{ spotify.current_user().get('display_name') }}</strong>'s account.</p>
-                <a class="btn btn-danger" href="/spotify/disconnect" role="button">Disconnect</a>
+                {% if current_user %}
+                    {% if current_user.get('images') %}
+                        <div class="row">
+                            <div class="col-lg-1 d-none d-lg-inline">
+                                <img class="img-fluid rounded-circle" src="{{ current_user.get('images')[0].get('url') }}" alt="User profile picture">
+                            </div>
+                            <div class="col">
+                                <p>Currently connected to <strong>{{ current_user.get('display_name') }}</strong>'s account.</p>
+                                <a class="btn btn-danger" href="{{ url_for('spotify_disconnect') }}" role="button">Disconnect</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>Currently connected to <strong>{{ current_user.get('display_name') }}</strong>'s account.</p>
+                        <a class="btn btn-danger" href="{{ url_for('spotify_disconnect') }}" role="button">Disconnect</a>
+                    {% endif %}
                 {% else %}
-                <p>Not connected to any Spotify account right now!</p>
-                <a class="btn btn-success" href="/spotify/connect" role="button">Connect</a>
+                    <p>Connect Spotify to display What's Playing?</p>
+                    <p>Not connected to any Spotify account right now!</p>
+                    <a class="btn btn-success" href="{{ url_for('spotify_connect') }}" role="button">Connect</a>
                 {% endif %}
             </div>
         </div>
