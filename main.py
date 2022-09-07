@@ -6,6 +6,7 @@ from spotipy import CacheFileHandler, SpotifyPKCE, Spotify, SpotifyOauthError
 
 from utils.commands import is_up, run_cmd
 from utils.files import read_value, write_file
+from utils.weather import get_weather
 
 app = Flask(__name__)
 
@@ -125,6 +126,11 @@ def spotify_disconnect():
 @app.route('/api/message', methods=['GET'])
 def api_get_message():
     return jsonify(message=message)
+
+
+@app.route('/api/weather', methods=['GET'])
+def api_get_weather():
+    return jsonify(weather=get_weather())
 
 
 @app.route('/api/currently_playing', methods=['GET'])
