@@ -3,8 +3,9 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, request, flash, redirect, url_for, render_template, jsonify
 
-from utils.api_utils import SpotifyHandler, WeatherHandler
-from utils.commands import is_up, run_cmd
+from handlers.spotify_handler import SpotifyHandler
+from handlers.weather_handler import WeatherHandler
+from utils.command_utils import is_up, run_cmd
 from utils.message import read_value, write_file
 
 app = Flask(__name__)
